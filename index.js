@@ -1,8 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+    methodOverride = require('method-override');
     morgan = require('morgan');
+    uui = require('uuid');
 
 const app = express();
+
+app.use(bodyParser.json());
+app.use(methodOverride());
 
 //Morgan for logging request data
 app.use(morgan('common'));
@@ -12,21 +17,23 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something went wrong!');
 });
 
-// Disabled the section below temporarily
+// Movies
 
-// const bodyParser = require('body-parser'),
-//     methodOverride = require('method-override');
+let genres = [
+    {
+        name: 'Science Fiction',
+        desc: 'Description of Science Fiction genre here'
+    }
+];
 
-// app.use(bodyParser.urlencoded({
-//     extended: true
-// }));
-
-// app.use(bodyParser.json());
-// app.use(methodOverride());
-
-// app.use((err, req, res, next) => {
-//     //logic
-// });
+let directors = [
+    {
+        name: 'Example Director Name',
+        bio: 'All about this director',
+        birth: 'Birth year here',
+        death: 'Death year here if applicable'
+    }
+];
 
 let topMovies = [
     {
@@ -101,7 +108,7 @@ let topMovies = [
     },
 ];
 
-//GET requests
+// GET requests
 app.get('/', (req, res) => {
     res.send('Welcome to myFlix!');
 });
@@ -114,9 +121,118 @@ app.get('/movies', (req, res) => {
     res.json(topMovies);
 });
 
+app.get('/movies/:title', (req, res) => {
+    res.json(topMovies.find((title) =>
+      { return topMovies.title === req.params.title }));
+  });
+
+app.get('/genres', (req, res) => {
+    res.json(genres);
+});
+
+app.get('/genres/:name', (req, res) => {
+    res.json(genres.find((genre) =>
+      { return genres.name === req.params.name }));
+  });
+
+app.get('/directors', (req, res) => {
+    res.json(directors);
+});
+
+app.get('/directors/:name', (req, res) => {
+    res.json(directors.find((director) =>
+      { return directors.name === req.params.name }));
+  });
+
 app.get('/secret', (req, res) => {
     res.send('You discovered the hidden message.');
 });
+
+
+// Users
+
+let users = [
+    {
+        id: 1,
+        name: Test,
+        info: {
+            password: 1234,
+            email: 'test@email.com',
+            dob: '01/01/1990',
+        }
+    },
+];
+
+    // Adds data for/Registers a new user.
+    app.post('/users', (req, res) => {
+        let newUser = req.body;
+    
+        if (!newUser.name) {
+        const message = 'Missing name in request body';
+        res.status(400).send(message);
+        } else {
+        newUser.id = uuid.v4();
+        users.push(newUser);
+        res.status(201).send(newUser);
+        }
+    });
+  
+  // Deletes/Deregisters a user from the list by ID.
+  app.delete('/users/:id', (req, res) => {
+    let user = users.find((user) => { return user.id === req.params.id });
+  
+    if (user) {
+      users = users.filter((obj) => { return obj.id !== req.params.id });
+      res.status(201).send('User ' + req.params.id + ' was deleted.');
+    }
+  });
+
+    // Update the username of a user by user name.
+    app.put('/users/:name', (req, res) => {
+        let user = users.find((user) => { return user.name === req.params.name });
+      
+        if (user) {
+          user.name[req.params.name] = parseInt(req.params.namne);
+          res.status(201).send('User ' + req.params.name + ' was assigned the username of ' + req.params.name);
+        } else {
+          res.status(404).send('User ' + req.params.name + ' was not found.');
+        }
+      });
+
+    // Update the password of a user by user name.
+    app.put('/users/:info/:password', (req, res) => {
+        let user = users.find((user) => { return user.name === req.params.name });
+    
+        if (user) {
+        user.info[req.params.info] = parseInt(req.params.password);
+        res.status(201).send('User ' + req.params.name + ' was assigned the password of ' + req.params.password);
+        } else {
+        res.status(404).send('User ' + req.params.name + ' was not found.');
+        }
+    });
+
+    // Update the email of a user by user name.
+    app.put('/users/:info/:email', (req, res) => {
+        let user = users.find((user) => { return user.name === req.params.name });
+    
+        if (user) {
+        user.info[req.params.info] = parseInt(req.params.email);
+        res.status(201).send('User ' + req.params.name + ' was assigned the email of ' + req.params.email);
+        } else {
+        res.status(404).send('User ' + req.params.name + ' was not found.');
+        }
+    });
+
+    app.put('/users/:info/:dob', (req, res) => {
+        let user = users.find((user) => { return user.name === req.params.name });
+    
+        if (user) {
+        user.info.dob[req.params.info.dob] = parseInt(req.params.dob);
+        res.status(201).send('User ' + req.params.name + ' was assigned the Date of Birth of ' + req.params.dob);
+        } else {
+        res.status(404).send('User ' + req.params.name + ' was not found.');
+        }
+    });
 
 //Listen for requests
 app.listen(8080, () => {
