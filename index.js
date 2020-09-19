@@ -1,8 +1,12 @@
 const express = require('express');
+
 const bodyParser = require('body-parser');
-    methodOverride = require('method-override');
-    morgan = require('morgan');
-    uui = require('uuid');
+    
+const uuid = require('uuid');
+
+const methodOverride = require('method-override');
+
+const morgan = require('morgan');
 
 const app = express();
 
@@ -154,9 +158,9 @@ app.get('/secret', (req, res) => {
 let users = [
     {
         id: 1,
-        name: Test,
+        name: 'Test',
         info: {
-            password: 1234,
+            password: '1234',
             email: 'test@email.com',
             dob: '01/01/1990',
         }
@@ -168,12 +172,13 @@ let users = [
         let newUser = req.body;
     
         if (!newUser.name) {
-        const message = 'Missing name in request body';
-        res.status(400).send(message);
+            const message = 'Missing name in request body';
+            res.status(400).send(message);
         } else {
-        newUser.id = uuid.v4();
-        users.push(newUser);
-        res.status(201).send(newUser);
+            console.log('new user:', newUser)
+            newUser.id = uuid.v4();
+            users.push(newUser);
+            res.status(201).send(newUser);
         }
     });
   
