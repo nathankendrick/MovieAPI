@@ -184,8 +184,8 @@ let users = [
   
   // Deletes/Deregisters a user from the list by ID.
   app.delete('/users/:id', (req, res) => {
-    let user = users.find((user) => { return user.id === req.params.id });
-  
+    let user = users.find((user) => parseInt(user.id) === parseInt(req.params.id));
+    console.log('user found', users, req.params.id)
     if (user) {
       users = users.filter((obj) => { return obj.id !== req.params.id });
       res.status(201).send('User ' + req.params.id + ' was deleted.');
