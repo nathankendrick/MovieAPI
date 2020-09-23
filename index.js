@@ -159,11 +159,9 @@ let users = [
     {
         id: 1,
         name: 'Test',
-        info: {
-            password: '1234',
-            email: 'test@email.com',
-            dob: '01/01/1990',
-        }
+        password: '1234',
+        email: 'test@email.com',
+        dob: '01/01/1990',
     },
 ];
 
@@ -201,41 +199,48 @@ let users = [
           res.status(201).send('User ' + req.params.name + ' was assigned the username of ' + req.params.name);
         } else {
           res.status(404).send('User ' + req.params.name + ' was not found.');
+          console.log('action failed');
         }
       });
 
     // Update the password of a user by user name.
-    app.put('/users/:info/:password', (req, res) => {
+    app.put('/users/:password', (req, res) => {
         let user = users.find((user) => { return user.name === req.params.name });
     
         if (user) {
-        user.info[req.params.info] = parseInt(req.params.password);
+        user.name[req.params.password] = parseInt(req.params.password);
+        console.log('passord updated successfully');
         res.status(201).send('User ' + req.params.name + ' was assigned the password of ' + req.params.password);
         } else {
         res.status(404).send('User ' + req.params.name + ' was not found.');
+        console.log('action failed');
         }
     });
 
     // Update the email of a user by user name.
-    app.put('/users/:info/:email', (req, res) => {
+    app.put('/users/:email', (req, res) => {
         let user = users.find((user) => { return user.name === req.params.name });
     
         if (user) {
-        user.info[req.params.info] = parseInt(req.params.email);
+        user.name[req.params.email] = parseInt(req.params.email);
+        console.log('email updated successfully');
         res.status(201).send('User ' + req.params.name + ' was assigned the email of ' + req.params.email);
         } else {
         res.status(404).send('User ' + req.params.name + ' was not found.');
+        console.log('action failed');
         }
     });
 
-    app.put('/users/:info/:dob', (req, res) => {
+    app.put('/users/:dob', (req, res) => {
         let user = users.find((user) => { return user.name === req.params.name });
     
         if (user) {
-        user.info.dob[req.params.info.dob] = parseInt(req.params.dob);
+        user.name[req.params.dob] = parseInt(req.params.dob);
+        console.log('dob updated successfully');
         res.status(201).send('User ' + req.params.name + ' was assigned the Date of Birth of ' + req.params.dob);
         } else {
         res.status(404).send('User ' + req.params.name + ' was not found.');
+        console.log('action failed');
         }
     });
 
