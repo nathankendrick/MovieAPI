@@ -191,7 +191,7 @@ let users = [
   });
 
     // Update the username of a user by user name.
-    app.put('/users/:name', (req, res) => {
+    app.put('/users/name/:name', (req, res) => {
         let user = users.find((user) => { return user.name === req.params.name });
       
         if (user) {
@@ -204,12 +204,12 @@ let users = [
       });
 
     // Update the password of a user by user name.
-    app.put('/users/:password', (req, res) => {
+    app.put('/users/password/:password', (req, res) => {
         let user = users.find((user) => { return user.name === req.params.name });
     
         if (user) {
         user.name[req.params.password] = parseInt(req.params.password);
-        console.log('passord updated successfully');
+        console.log('password updated successfully');
         res.status(201).send('User ' + req.params.name + ' was assigned the password of ' + req.params.password);
         } else {
         res.status(404).send('User ' + req.params.name + ' was not found.');
@@ -218,7 +218,7 @@ let users = [
     });
 
     // Update the email of a user by user name.
-    app.put('/users/:email', (req, res) => {
+    app.put('/users/email/:email', (req, res) => {
         let user = users.find((user) => { return user.name === req.params.name });
     
         if (user) {
@@ -231,7 +231,7 @@ let users = [
         }
     });
 
-    app.put('/users/:dob', (req, res) => {
+    app.put('/users/dob/:dob', (req, res) => {
         let user = users.find((user) => { return user.name === req.params.name });
     
         if (user) {
