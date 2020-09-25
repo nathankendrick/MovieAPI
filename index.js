@@ -23,22 +23,6 @@ app.use((err, req, res, next) => {
 
 // Movies
 
-let genres = [
-    {
-        name: 'Science Fiction',
-        desc: 'Description of Science Fiction genre here'
-    }
-];
-
-let directors = [
-    {
-        name: 'Example Director Name',
-        bio: 'All about this director',
-        birth: 'Birth year here',
-        death: 'Death year here if applicable'
-    }
-];
-
 let topMovies = [
     {
         title: 'Ghostbusters',
@@ -126,26 +110,18 @@ app.get('/movies', (req, res) => {
 });
 
 app.get('/movies/:title', (req, res) => {
-    res.json(topMovies.find((title) =>
-      { return topMovies.title === req.params.title }));
+    res.json(topMovies.find((movie) =>
+      { return movie.title === req.params.title }));
   });
 
-app.get('/genres', (req, res) => {
-    res.json(genres);
-});
-
-app.get('/genres/:name', (req, res) => {
-    res.json(genres.find((genre) =>
-      { return genres.name === req.params.name }));
+app.get('/movies/:genre', (req, res) => {
+    res.json(topMovies.find((movie) =>
+      { return movie.genre === req.params.genre }));
   });
 
-app.get('/directors', (req, res) => {
-    res.json(directors);
-});
-
-app.get('/directors/:name', (req, res) => {
-    res.json(directors.find((director) =>
-      { return directors.name === req.params.name }));
+app.get('/movies/:director', (req, res) => {
+    res.json(topMovies.find((director) =>
+      { return movie.director === req.params.director }));
   });
 
 app.get('/secret', (req, res) => {
