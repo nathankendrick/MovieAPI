@@ -109,18 +109,18 @@ app.get('/movies', (req, res) => {
     res.json(topMovies);
 });
 
-app.get('/movies/:title', (req, res) => {
+app.get('/movies/titles/:title', (req, res) => {
     res.json(topMovies.find((movie) =>
       { return movie.title === req.params.title }));
   });
 
-app.get('/movies/:genre', (req, res) => {
+app.get('/movies/genres/:genre', (req, res) => {
     res.json(topMovies.find((movie) =>
       { return movie.genre === req.params.genre }));
   });
 
-app.get('/movies/:director', (req, res) => {
-    res.json(topMovies.find((director) =>
+app.get('/movies/directors/:director', (req, res) => {
+    res.json(topMovies.find((movie) =>
       { return movie.director === req.params.director }));
   });
 
@@ -133,7 +133,7 @@ app.get('/secret', (req, res) => {
 
 let users = [
     {
-        id: 1,
+        id: '1',
         name: 'Test',
         password: '1234',
         email: 'test@email.com',
@@ -158,66 +158,67 @@ let users = [
   
   // Deletes/Deregisters a user from the list by ID.
   app.delete('/users/:id', (req, res) => {
-    let user = users.find((user) => parseInt(user.id) === parseInt(req.params.id));
-    console.log('user found', users, req.params.id)
+      console.log(req.params);
+    let user = users.find((user) => user.id === req.params.id);
+    console.log('user found', user, req.params.id)
     if (user) {
+        console.log(users);
       users = users.filter((obj) => { return obj.id !== req.params.id });
+      console.log(users);
       res.status(201).send('User ' + req.params.id + ' was deleted.');
+    } else {
+        res.status(404).send('User' + req.params.id +' was not found');
     }
   });
 
-    // Update the username of a user by user name.
-    app.put('/users/name/:name', (req, res) => {
-        let user = users.find((user) => { return user.name === req.params.name });
-      
+    app.put('/users/:id', (req, res) => {
+        let user = users.find((user) => user.id === req.params.id);
+    
         if (user) {
-          user.name[req.params.name] = parseInt(req.params.namne);
-          res.status(201).send('User ' + req.params.name + ' was assigned the username of ' + req.params.name);
+          user.name = req.body.name;
+          user.password = req.body.password;
+          user.email = req.body.email;
+          user.dob = req.body.dob;
+    
+          res.status(201).send(user);
         } else {
-          res.status(404).send('User ' + req.params.name + ' was not found.');
+          res.status(404).send('User ' + req.params.id + ' was not found.');
           console.log('action failed');
         }
-      });
-
-    // Update the password of a user by user name.
-    app.put('/users/password/:password', (req, res) => {
-        let user = users.find((user) => { return user.name === req.params.name });
-    
-        if (user) {
-        user.name[req.params.password] = parseInt(req.params.password);
-        console.log('password updated successfully');
-        res.status(201).send('User ' + req.params.name + ' was assigned the password of ' + req.params.password);
-        } else {
-        res.status(404).send('User ' + req.params.name + ' was not found.');
-        console.log('action failed');
-        }
     });
 
-    // Update the email of a user by user name.
-    app.put('/users/email/:email', (req, res) => {
-        let user = users.find((user) => { return user.name === req.params.name });
-    
-        if (user) {
-        user.name[req.params.email] = parseInt(req.params.email);
-        console.log('email updated successfully');
-        res.status(201).send('User ' + req.params.name + ' was assigned the email of ' + req.params.email);
-        } else {
-        res.status(404).send('User ' + req.params.name + ' was not found.');
-        console.log('action failed');
-        }
+    //GET user by id
+    app.get('/users', (req, res) => {
+        res.status(200).send(users);
     });
 
-    app.put('/users/dob/:dob', (req, res) => {
-        let user = users.find((user) => { return user.name === req.params.name });
-    
+    app.put('/users/:id/addFavorite/:movie', (req, res) => {
+        let user = users.find((user) => user.id === req.params.id);
+
         if (user) {
-        user.name[req.params.dob] = parseInt(req.params.dob);
-        console.log('dob updated successfully');
-        res.status(201).send('User ' + req.params.name + ' was assigned the Date of Birth of ' + req.params.dob);
-        } else {
-        res.status(404).send('User ' + req.params.name + ' was not found.');
-        console.log('action failed');
-        }
+            if (!user.favorites) {
+                user.favorites = [];
+            }
+            user.favorites.push(req.params.movie);
+      
+            res.status(201).send(user);
+          } else {
+            res.status(404).send('User ' + req.params.id + ' was not found.');
+            console.log('action failed');
+          }
+    });
+
+    app.put('/users/:id/removeFavorite/:movie', (req, res) => {
+        let user = users.find((user) => user.id === req.params.id);
+
+        if (user && user.favorites) {
+            user.favorites = user.favorites.filter((movie) => { return movie !== req.params.movie });
+      
+            res.status(201).send(user);
+          } else {
+            res.status(404).send('User ' + req.params.id + ' was not found.');
+            console.log('action failed');
+          }
     });
 
 //Listen for requests
