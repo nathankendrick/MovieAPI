@@ -21,6 +21,17 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something went wrong!');
 });
 
+// Integrating Mongoose
+
+const mongoose = require('mongoose');
+const Models = require('./models.js');
+
+const Movies = Models.Movie;
+const Users = Models.User;
+
+mongoose.connect('mongodb://localhost:27017/myflixdb', { useNewUrlParser: true, useUnifiedTopology: true });
+
+
 // Movies
 
 let topMovies = [
@@ -141,20 +152,54 @@ let users = [
     },
 ];
 
-    // Adds data for/Registers a new user.
-    app.post('/users', (req, res) => {
-        let newUser = req.body;
+// Adds data for/Registers a new user.
+// JSON in this format:
+    // {
+    //     ID: Integer,
+    //     Username: String,
+    //     Password: String,
+    //     Email: String,
+    //     Birthday: Date
+    // }
+app.post('/users', (req, res) => {
+    Users.findOne({ Username: req.body.Username })
+        .then((user) => {
+            if (user) {
+                return res.status(400).send(req.body.Username + 'already exists');
+            } else {
+                Users
+                    .create({
+                        Username: req.body.Username,
+                        Password: req.body.Password,
+                        Email: req.body.Email,
+                        Birthday: req.body.Birthday
+                    })
+                    .then((user) =>{res.status(201).json(user) })
+                .catch((error) => {
+                    console.error(error);
+                    res.status(500).send('Error: ' + error);
+                })
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: ' + error);
+        });
+});
+
+    // app.post('/users', (req, res) => {
+    //     let newUser = req.body;
     
-        if (!newUser.name) {
-            const message = 'Missing name in request body';
-            res.status(400).send(message);
-        } else {
-            console.log('new user:', newUser)
-            newUser.id = uuid.v4();
-            users.push(newUser);
-            res.status(201).send(newUser);
-        }
-    });
+    //     if (!newUser.name) {
+    //         const message = 'Missing name in request body';
+    //         res.status(400).send(message);
+    //     } else {
+    //         console.log('new user:', newUser)
+    //         newUser.id = uuid.v4();
+    //         users.push(newUser);
+    //         res.status(201).send(newUser);
+    //     }
+    // });
   
   // Deletes/Deregisters a user from the list by ID.
   app.delete('/users/:id', (req, res) => {
@@ -187,39 +232,63 @@ let users = [
         }
     });
 
-    //GET user by id
+    //GET all users
     app.get('/users', (req, res) => {
-        res.status(200).send(users);
+        Users.find()
+            .then((users) => {
+                res.status(201).json(users);
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).send('Error: ' + err);
+            });
     });
 
-    app.put('/users/:id/addFavorite/:movie', (req, res) => {
-        let user = users.find((user) => user.id === req.params.id);
+    //GET a user by username
+    app.get('/users/:Username', (req, res) => {
+        Users.findOne({ Username: req.params.Username })
+        .then((user) => {
+            res.json(user);
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        });
+    })
 
-        if (user) {
-            if (!user.favorites) {
-                user.favorites = [];
-            }
-            user.favorites.push(req.params.movie);
+    //OLD GET user by id
+    // app.get('/users', (req, res) => {
+    //     res.status(200).send(users);
+    // });
+
+    // app.put('/users/:id/addFavorite/:movie', (req, res) => {
+    //     let user = users.find((user) => user.id === req.params.id);
+
+    //     if (user) {
+    //         if (!user.favorites) {
+    //             user.favorites = [];
+    //         }
+    //         user.favorites.push(req.params.movie);
       
-            res.status(201).send(user);
-          } else {
-            res.status(404).send('User ' + req.params.id + ' was not found.');
-            console.log('action failed');
-          }
-    });
+    //         res.status(201).send(user);
+    //       } else {
+    //         res.status(404).send('User ' + req.params.id + ' was not found.');
+    //         console.log('action failed');
+    //       }
+    // });
 
-    app.put('/users/:id/removeFavorite/:movie', (req, res) => {
-        let user = users.find((user) => user.id === req.params.id);
+    // app.put('/users/:id/removeFavorite/:movie', (req, res) => {
+    //     let user = users.find((user) => user.id === req.params.id);
 
-        if (user && user.favorites) {
-            user.favorites = user.favorites.filter((movie) => { return movie !== req.params.movie });
+    //     if (user && user.favorites) {
+    //         user.favorites = user.favorites.filter((movie) => { return movie !== req.params.movie });
       
-            res.status(201).send(user);
-          } else {
-            res.status(404).send('User ' + req.params.id + ' was not found.');
-            console.log('action failed');
-          }
-    });
+    //         res.status(201).send(user);
+    //       } else {
+    //         res.status(404).send('User ' + req.params.id + ' was not found.');
+    //         console.log('action failed');
+    //       }
+    // });
 
 //Listen for requests
 app.listen(8080, () => {
